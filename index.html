@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dinner Planner 🍽️</title>
+<meta name="theme-color" content="#14110f">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">
+    <span class="logo">🍽️</span>
+    <div>
+      <h1>Dinner Planner</h1>
+      <p>Pick dishes · compare prices · split the bill</p>
+    </div>
+  </div>
+  <nav class="tabs">
+    <button class="tab active" data-view="menu">Menu</button>
+    <button class="tab" data-view="list">My List <span id="badge" class="badge hidden">0</span></button>
+    <button class="tab" data-view="admin">⚙ Admin</button>
+  </nav>
+</header>
+
+<main>
+  <!-- MENU -->
+  <section id="menuView" class="view">
+    <div class="toolbar">
+      <input id="search" type="search" placeholder="Search dishes…">
+      <select id="sort">
+        <option value="default">Sort: Default</option>
+        <option value="low">Price: Low → High</option>
+        <option value="high">Price: High → Low</option>
+      </select>
+    </div>
+    <div id="chips" class="chips"></div>
+    <div id="grid" class="grid"></div>
+  </section>
+
+  <!-- LIST -->
+  <section id="listView" class="view hidden">
+    <div id="listEmpty" class="empty hidden">
+      <div>🛒</div>
+      <p>Your list is empty. Go to the menu and add some dishes!</p>
+      <button class="btn" data-goto="menu">Browse menu</button>
+    </div>
+
+    <div id="listWrap">
+      <div id="listRows" class="rows"></div>
+
+      <div class="bill">
+        <h2>Bill estimate</h2>
+        <div class="line"><span>Subtotal</span><b id="subtotal">₹0</b></div>
+        <label class="line check">
+          <span><input type="checkbox" id="gstToggle" checked> Add GST</span>
+          <span class="gst-wrap"><input type="number" id="gstRate" value="5" min="0" max="40" step="0.5"> %</span>
+          <b id="gstAmt">₹0</b>
+        </label>
+        <div class="line total"><span>Total</span><b id="total">₹0</b></div>
+        <div class="split">
+          <div class="people">
+            <span>Split between</span>
+            <div class="stepper">
+              <button id="pMinus">−</button><b id="people">3</b><button id="pPlus">+</button>
+            </div>
+          </div>
+          <div class="each"><small>Each person pays</small><strong id="each">₹0</strong></div>
+        </div>
+        <div class="actions">
+          <button class="btn" id="copyText">📋 Copy as text</button>
+          <button class="btn ghost" id="copyLink">🔗 Copy share link</button>
+          <button class="btn danger" id="clearList">Clear</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ADMIN -->
+  <section id="adminView" class="view hidden">
+    <div id="localBanner" class="notice hidden"></div>
+
+    <div id="login" class="card login">
+      <h2>🔐 Admin login</h2>
+      <p>Enter the password to add or edit dishes.</p>
+      <input id="pw" type="password" placeholder="Password" autocomplete="current-password">
+      <button class="btn" id="loginBtn">Unlock</button>
+      <small id="loginErr" class="err"></small>
+    </div>
+
+    <div id="panel" class="hidden">
+      <div class="card">
+        <h2>➕ Add a dish</h2>
+        <div class="form">
+          <input id="nName" placeholder="Dish name">
+          <input id="nPrice" type="number" min="0" placeholder="Price (₹)">
+          <input id="nCat" list="cats" placeholder="Category (e.g. Main)">
+          <datalist id="cats"></datalist>
+          <label class="veg-check"><input type="checkbox" id="nVeg"> Veg</label>
+          <button class="btn" id="addBtn">Add dish</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2>✏️ Edit menu <small id="count"></small></h2>
+          <div>
+            <button class="btn ghost sm" id="resetBtn">Reset to defaults</button>
+            <button class="btn ghost sm" id="logoutBtn">Lock</button>
+          </div>
+        </div>
+        <div id="editRows" class="edit-rows"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+
+<button id="fab" class="fab">＋ Add dish</button>
+
+<div id="modal" class="modal hidden">
+  <div class="sheet">
+    <div class="sheet-head"><h2>Add to menu</h2><button id="mClose" class="x" title="Close">✕</button></div>
+    <div class="seg">
+      <button class="segbtn active" data-mode="one">One dish</button>
+      <button class="segbtn" data-mode="bulk">Paste many</button>
+    </div>
+
+    <div id="mOne" class="mbody">
+      <input id="mName" placeholder="Dish name">
+      <div class="two">
+        <input id="mPrice" type="number" min="0" inputmode="decimal" placeholder="Price (₹)">
+        <input id="mCat" list="cats" placeholder="Category">
+      </div>
+      <div class="vegpick">
+        <button type="button" id="vegY" class="vp on">🟢 Veg</button>
+        <button type="button" id="vegN" class="vp">🔴 Non-veg</button>
+      </div>
+    </div>
+
+    <div id="mBulk" class="mbody hidden">
+      <textarea id="mText" rows="7" placeholder="One dish per line, name then price:&#10;Dal Makhani 349&#10;Chicken Biryani - 429&#10;Gulab Jamun, 129"></textarea>
+      <small class="hint">Category and veg/non-veg are guessed from the name. You can fix them later in ⚙ Admin.</small>
+    </div>
+
+    <div id="mAuth" class="mbody hidden">
+      <input id="mPw" type="password" placeholder="Admin password" autocomplete="current-password">
+    </div>
+    <small id="mErr" class="err"></small>
+
+    <label class="veg-check addlist"><input type="checkbox" id="mAddList" checked> Also add to my list</label>
+    <button class="btn wide" id="mSave">Add &amp; save</button>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<div id="stickyBar" class="sticky hidden">
+  <div><small id="stickyCount">0 items</small><b id="stickyTotal">₹0</b></div>
+  <button class="btn" data-goto="list">View list →</button>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
