@@ -10,3 +10,4 @@ Open index.html in a browser. Menu edits are saved on your device only (local mo
 3. Project → Storage (or Marketplace) → Upstash Redis → create free DB → Connect to this project.
 4. Project → Settings → Environment Variables → add ADMIN_PASSWORD = your secret password.
 5. Deployments → Redeploy. Open the site → ⚙ Admin → enter your password.
+.
